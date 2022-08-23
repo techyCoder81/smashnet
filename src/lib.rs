@@ -5,7 +5,7 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 #![feature(c_variadic)]
-use std::{io::{BufWriter}, fs::File};
+use std::{io::{BufWriter, Write}, fs::File, path::Path};
 
 mod curl;
 
@@ -28,7 +28,8 @@ pub fn main() {
         std::fs::File::create(path).unwrap()
     );
     println!("created bufwriter with capacity");
-    let url = format!("https://github.com/HDR-Development/HDR-Nightlies/releases/download/v0.19.1/hdr_version.txt").as_str();
+    let url_string = format!("https://github.com/HDR-Development/HDR-Nightlies/releases/download/v0.19.1/hdr_version.txt");
+    let url = url_string.as_str();
     println!("Curl output: {}", match curl::try_curl_maidenless(url, &mut writer) {
         Ok(()) => "curl was OK!".to_string(),
         Err(e) => format!("Failed output: {:?}", e)
