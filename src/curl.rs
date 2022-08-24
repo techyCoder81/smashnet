@@ -5,6 +5,7 @@ use online::sync::check;
 use curl_sys::CURL;
 use std::error::Error;
 use std::path::Path;
+use crate::types::*;
 
 //use crate::DownloadInfo;
 
@@ -24,6 +25,7 @@ pub unsafe fn libcurl_resolver_thread_stack_size_set(ctx: &mut skyline::hooks::I
 pub unsafe fn libcurl_resolver_thread_stack_size_set2(ctx: &mut skyline::hooks::InlineCtx) {
     *ctx.registers[4].x.as_mut() = 0x10_000;
 }
+
 
 #[skyline::from_offset(0x7f0)]
 pub unsafe extern "C" fn global_init_mem(
@@ -100,34 +102,27 @@ static mut START_TICK: usize = 0;
 static mut SENDER: Option<*mut Sender<DownloadInfo>> = None;
 */
 
-pub struct Curler {
-    callback: Option<fn(f64, f64) -> ()>,
-    curl: *mut CURL,
-}
-
-pub trait HttpCurl {
-    fn new() -> Self;
-    fn is_valid(&mut self) -> Result<&mut Self, u64>;
-    fn download(&mut self, url: String, location: String) -> Result<(), u32>;
-    fn progress_callback(&mut self, callback: fn(f64, f64) -> ()) -> &mut Self;
-}
-
 impl HttpCurl for Curler {
-    fn new() -> Self { 
+
+    #[export_name = "HttpCurl__new"]
+    extern "Rust" fn new() -> Self { 
         let curl_handle = unsafe { easy_init() };
-        return Curler{callback: None, curl: curl_handle};
+        return Curler{callback: None, curl: curl_handle as u64};
     }
-    fn is_valid(&mut self) -> Result<&mut Self, u64> {
-        if self.curl.is_null() {
-            let error = format!("curl failed to initialize! Pointer value: {:p}", self.curl);
+    #[export_name = "HttpCurl__is_valid"]
+    extern "Rust" fn is_valid(&mut self) -> Result<&mut Self, u64> {
+        let curl = self.curl as *mut CURL;
+        if curl.is_null() {
+            let error = format!("curl failed to initialize! Pointer value: {:p}", curl);
             println!("{}", error);
-            return Err(self.curl as u64);
+            return Err(self.curl);
         }
         return Ok(self);
     }
 
     /// download a file from the given url to the given location
-    fn download(&mut self, url: String, location: String) -> Result<(), u32>{
+    #[export_name = "HttpCurl__download"]
+    extern "Rust" fn download(&mut self, url: String, location: String) -> Result<(), u32>{
         // change thread to high priority
         unsafe {
             skyline::nn::os::ChangeThreadPriority(skyline::nn::os::GetCurrentThread(), 2);
@@ -149,27 +144,28 @@ impl HttpCurl for Curler {
         unsafe {
             let cstr = [url.as_str(), "\0"].concat();
             let ptr = cstr.as_str().as_ptr();
+            let curl = self.curl as *mut CURL;
             println!("curl is initialized, beginning options");
             let header = slist_append(std::ptr::null_mut(), "Accept: application/octet-stream\0".as_ptr());
-            curle!(easy_setopt(self.curl, curl_sys::CURLOPT_URL, ptr))?;
-            curle!(easy_setopt(self.curl, curl_sys::CURLOPT_HTTPHEADER, header))?;
-            curle!(easy_setopt(self.curl, curl_sys::CURLOPT_FOLLOWLOCATION, 1u64))?;
-            curle!(easy_setopt(self.curl, curl_sys::CURLOPT_WRITEDATA, &mut writer))?;
-            curle!(easy_setopt(self.curl, curl_sys::CURLOPT_WRITEFUNCTION, write_fn as *const ()))?;
+            curle!(easy_setopt(curl, curl_sys::CURLOPT_URL, ptr))?;
+            curle!(easy_setopt(curl, curl_sys::CURLOPT_HTTPHEADER, header))?;
+            curle!(easy_setopt(curl, curl_sys::CURLOPT_FOLLOWLOCATION, 1u64))?;
+            curle!(easy_setopt(curl, curl_sys::CURLOPT_WRITEDATA, &mut writer))?;
+            curle!(easy_setopt(curl, curl_sys::CURLOPT_WRITEFUNCTION, write_fn as *const ()))?;
        
             match self.callback {
                 Some(function) => {
-                    curle!(easy_setopt(self.curl, curl_sys::CURLOPT_NOPROGRESS, 0u64))?;
-                    curle!(easy_setopt(self.curl, curl_sys::CURLOPT_PROGRESSDATA, function as *const ()))?;
-                    curle!(easy_setopt(self.curl, curl_sys::CURLOPT_PROGRESSFUNCTION, callback_internal as *const ()))?;
+                    curle!(easy_setopt(curl, curl_sys::CURLOPT_NOPROGRESS, 0u64))?;
+                    curle!(easy_setopt(curl, curl_sys::CURLOPT_PROGRESSDATA, function as *const ()))?;
+                    curle!(easy_setopt(curl, curl_sys::CURLOPT_PROGRESSFUNCTION, callback_internal as *const ()))?;
                 },
-                None => curle!(easy_setopt(self.curl, curl_sys::CURLOPT_NOPROGRESS, 1u64))?,
+                None => curle!(easy_setopt(curl, curl_sys::CURLOPT_NOPROGRESS, 1u64))?,
             }
-            curle!(easy_setopt(self.curl, curl_sys::CURLOPT_NOSIGNAL, 1u64))?;
-            curle!(easy_setopt(self.curl, curl_sys::CURLOPT_SSL_CTX_FUNCTION, curl_ssl_ctx_callback as *const ()))?;
-            curle!(easy_setopt(self.curl, curl_sys::CURLOPT_USERAGENT, "smashnet\0".as_ptr()))?;
+            curle!(easy_setopt(curl, curl_sys::CURLOPT_NOSIGNAL, 1u64))?;
+            curle!(easy_setopt(curl, curl_sys::CURLOPT_SSL_CTX_FUNCTION, curl_ssl_ctx_callback as *const ()))?;
+            curle!(easy_setopt(curl, curl_sys::CURLOPT_USERAGENT, "smashnet\0".as_ptr()))?;
             println!("beginning download.");
-            match curle!(easy_perform(self.curl)){
+            match curle!(easy_perform(curl)){
                 Ok(()) => println!("curl success?"),
                 Err(e) => println!("Error during curl: {}", e) 
             };
@@ -194,121 +190,27 @@ impl HttpCurl for Curler {
         }
         Ok(())
     }
-    fn progress_callback(&mut self, function: fn(f64, f64) -> ()) -> &mut Self {
+    #[export_name = "HttpCurl__progress_callback"]
+    extern "Rust" fn progress_callback(&mut self, function: fn(f64, f64) -> ()) -> &mut Self {
         self.callback = Some(function);
         self
     }
 }
 
 impl Drop for Curler {
-    fn drop(&mut self) {
-        if !self.curl.is_null() {
+    #[export_name = "Curler__drop"]
+    extern "Rust" fn drop(&mut self) {
+        let curl = self.curl as *mut CURL;
+        if !curl.is_null() {
             println!("cleaning up curl handle from curler.");
             unsafe { 
-                match curle!(easy_cleanup(self.curl)) {
+                match curle!(easy_cleanup(curl)) {
                     Ok(_) => println!("cleaned up curl successfully."),
                     Err(e) => println!("cleaning up curl failed with error code: {}", e),
                 }; 
             }
         }
     }
-}
-
-/*
-unsafe extern "C" fn progress_func(session: &WebSession, dl_total: f64, dl_now: f64, ul_total: f64, ul_now: f64) -> usize {
-    let current_tick = skyline::nn::os::GetSystemTick() as usize;
-    let nanoseconds = ((current_tick - START_TICK) * 625) / 12;
-    let seconds_f = (nanoseconds as f64) / (1000.0 * 1000.0 * 1000.0);
-    let bps = dl_now * 8.0 / seconds_f;
-
-    (**(SENDER.as_ref().unwrap())).send(crate::DownloadInfo::new(bps, dl_now, dl_total, ""));
-    // println!("{} / {} | {} mbps", dl_now, dl_total, bps / (1024.0 * 1024.0));
-
-    // session.send_json(&crate::DownloadInfo::new(bps, dl_now, dl_total, "release archive"));
-    0
-}
-*/
-
-/*
-pub fn try_curl(
-    url: &str,
-    writer: &mut BufWriter<File>,
-    session: &WebSession,
-    mut sender: Sender<DownloadInfo>
-) -> Result<(), u32> {
-    if !check(None).is_ok() {
-        println!("there is no internet connection, cannot curl!");
-        Ok(())
-    } else {
-        println!("curling is allowed, we do have internet");
-        unsafe {
-            SENDER = Some(std::mem::transmute(&mut sender as *mut Sender<DownloadInfo>));
-            // assert_eq!(global_init_mem(3, malloc, free, realloc, strdup, calloc), curl_sys::CURLE_OK);
-            let ptr = [url, "\0"].concat();
-            let curl = easy_init();
-            if curl.is_null() {
-                println!("curl was null when initializing! This likely means there is no internet connection.");
-                ()
-            }
-
-            let header = slist_append(std::ptr::null_mut(), "Accept: application/octet-stream\0".as_ptr());
-            curle!(easy_setopt(curl, curl_sys::CURLOPT_URL, ptr.as_str().as_ptr()))?;
-            curle!(easy_setopt(curl, curl_sys::CURLOPT_HTTPHEADER, header))?;
-            curle!(easy_setopt(curl, curl_sys::CURLOPT_FOLLOWLOCATION, 1u64))?;
-            curle!(easy_setopt(curl, curl_sys::CURLOPT_WRITEDATA, writer))?;
-            curle!(easy_setopt(curl, curl_sys::CURLOPT_WRITEFUNCTION, write_fn as *const ()))?;
-            curle!(easy_setopt(curl, curl_sys::CURLOPT_NOPROGRESS, 0u64))?;
-            curle!(easy_setopt(curl, curl_sys::CURLOPT_PROGRESSDATA, session))?;
-            curle!(easy_setopt(curl, curl_sys::CURLOPT_PROGRESSFUNCTION, progress_func as *const ()))?;
-            curle!(easy_setopt(curl, curl_sys::CURLOPT_SSL_CTX_FUNCTION, curl_ssl_ctx_callback as *const ()))?;
-            curle!(easy_setopt(curl, curl_sys::CURLOPT_USERAGENT, "HDR-Launcher\0".as_ptr()))?;
-            START_TICK = skyline::nn::os::GetSystemTick() as usize;
-            curle!(easy_perform(curl))?;
-            curle!(easy_cleanup(curl))?;
-        }
-
-        Ok(())
-    }
-}
-*/
-pub fn try_curl_maidenless(
-    url: &str,
-    writer: &mut BufWriter<File>
-) -> Result<(), u32> {
-    println!("starting maidenless curl");
-    
-        unsafe {
-            let cstr = [url, "\0"].concat();
-            let ptr = cstr.as_str().as_ptr();
-            println!("initializing curl...");
-            let curl = easy_init();
-            println!("Curl init return value: {:p}", curl);
-            if curl.is_null() {
-                println!("curl was null when initializing! This likely means there is no internet connection.");
-                ()
-            } else {
-                println!("curl is initialized, beginning options");
-                let header = slist_append(std::ptr::null_mut(), "Accept: application/octet-stream\0".as_ptr());
-                curle!(easy_setopt(curl, curl_sys::CURLOPT_URL, ptr))?;
-                curle!(easy_setopt(curl, curl_sys::CURLOPT_HTTPHEADER, header))?;
-                curle!(easy_setopt(curl, curl_sys::CURLOPT_FOLLOWLOCATION, 1u64))?;
-                curle!(easy_setopt(curl, curl_sys::CURLOPT_WRITEDATA, writer))?;
-                curle!(easy_setopt(curl, curl_sys::CURLOPT_WRITEFUNCTION, write_fn as *const ()))?;
-                curle!(easy_setopt(curl, curl_sys::CURLOPT_NOPROGRESS, 1u64))?;
-                curle!(easy_setopt(curl, curl_sys::CURLOPT_NOSIGNAL, 1u64))?;
-                curle!(easy_setopt(curl, curl_sys::CURLOPT_SSL_CTX_FUNCTION, curl_ssl_ctx_callback as *const ()))?;
-                curle!(easy_setopt(curl, curl_sys::CURLOPT_USERAGENT, "smashnet\0".as_ptr()))?;
-                println!("beginning perform.");
-                match curle!(easy_perform(curl)){
-                    Ok(()) => println!("curl success?"),
-                    Err(e) => println!("Error during curl: {}", e) 
-                };
-                println!("beginning curl cleanup.");
-                curle!(easy_cleanup(curl))?;
-            }
-        }
-
-        Ok(())
 }
 
 pub fn install() {

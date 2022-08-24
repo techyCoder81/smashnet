@@ -15,6 +15,9 @@ skyline = { git = "https://github.com/ultimate-research/skyline-rs.git" }
 curl-sys = { git = "https://github.com/techyCoder81/curl-rust.git", branch = "main" }
 online = { version = "3.0.1",  default-features = false, features = ["sync"] }
 
+[features]
+dynamic = []
+
 [profile.dev]
 panic = "abort"
 
