@@ -1,4 +1,4 @@
-struct Curler {
+pub struct Curler {
     pub callback: Option<fn(f64, f64) -> ()>,
     pub curl: u64,
 }

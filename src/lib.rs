@@ -10,7 +10,10 @@ use std::{io::{BufWriter, Write}, fs::File, path::Path};
 #[cfg(not(feature = "nro"))]
 pub mod api;
 
-pub mod types;
+mod types;
+pub use types::HttpCurl;
+#[cfg(not(feature = "nro"))]
+pub use types::Curler;
 
 // this package is the plugin api (the extern api)
 
