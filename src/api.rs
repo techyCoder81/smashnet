@@ -21,18 +21,18 @@ impl HttpCurl for Curler {
         HttpCurl__new()
     }
     fn is_valid(&mut self) -> Result<&mut Self, u64> {
-        HttpCurl__is_valid()
+        HttpCurl__is_valid(self)
     }
     fn download(&mut self, url: String, location: String) -> Result<(), u32> {
-        HttpCurl__download()
+        HttpCurl__download(self, url, location)
     }
     fn progress_callback(&mut self, callback: fn(f64, f64) -> ()) -> &mut Self {
-        HttpCurl__progress_callback()
+        HttpCurl__progress_callback(self, callback)
     }
 }
 
 impl Drop for Curler {
     fn drop(&mut self) {
-        Curler__drop(&mut self)
+        Curler__drop(self)
     }
 }

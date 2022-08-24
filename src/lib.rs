@@ -28,22 +28,9 @@ pub mod types;
 #[cfg(not(feature = "dynamic"))]
 #[skyline::main(name = "smashnet")]
 pub fn main() -> Result<(), u64> {
-    curl::install();
     
     println!("starting main for smashnet");
     
-    let location = format!("sd:/content_hashes.txt");
-    let url = format!("https://github.com/HDR-Development/HDR-Releases/releases/download/v0.18.3/content_hashes.txt");
-    match Curler::new()
-        .is_valid()?
-        .progress_callback(
-            |total, current| println!("Progress: {}", current/total)
-        )
-        .download(url, location) {
-            Ok(()) => println!("download successful!"),
-            Err(e) => println!("download failed with error code: {}", e)
-        };
-
     println!("Smashnet main has run.");
     Ok(())
 }

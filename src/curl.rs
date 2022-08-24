@@ -97,15 +97,11 @@ macro_rules! curle {
     }}
 }
 
-/*
-static mut START_TICK: usize = 0;
-static mut SENDER: Option<*mut Sender<DownloadInfo>> = None;
-*/
-
 impl HttpCurl for Curler {
 
     #[export_name = "HttpCurl__new"]
     extern "Rust" fn new() -> Self { 
+        install_curl();
         let curl_handle = unsafe { easy_init() };
         return Curler{callback: None, curl: curl_handle as u64};
     }
@@ -213,10 +209,18 @@ impl Drop for Curler {
     }
 }
 
-pub fn install() {
-    skyline::install_hooks!(
-        curl_log_hook,
-        libcurl_resolver_thread_stack_size_set,
-        libcurl_resolver_thread_stack_size_set2
-    );
+
+static mut INSTALLED: bool = false;
+
+pub fn install_curl() {
+    unsafe {
+        if (!INSTALLED) {
+            INSTALLED = true;
+            skyline::install_hooks!(
+                curl_log_hook,
+                libcurl_resolver_thread_stack_size_set,
+                libcurl_resolver_thread_stack_size_set2
+            );
+        }
+    }
 }
