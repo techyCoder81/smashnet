@@ -1,9 +1,9 @@
-pub struct Curler {
+struct Curler {
     pub callback: Option<fn(f64, f64) -> ()>,
     pub curl: u64,
 }
 
-trait HttpCurl {
+pub trait HttpCurl {
     fn new() -> Self;
     fn is_valid(&mut self) -> Result<&mut Self, u64>;
     fn download(&mut self, url: String, location: String) -> Result<(), u32>;
