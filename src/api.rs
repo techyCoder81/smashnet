@@ -5,7 +5,7 @@ extern "Rust" {
     #[link_name = "HttpCurl__new"]
     fn HttpCurl__new() -> Self;
     #[link_name = "HttpCurl__is_valid"]
-    fn HttpCurl__is_valid(&mut self) -> Result<&mut Self, u64>;
+    fn HttpCurl__is_valid(&mut self) -> Result<&mut Curler, u64>;
     #[link_name = "HttpCurl__download"]
     fn HttpCurl__download(&mut self, url: String, location: String) -> Result<(), u32>;
     #[link_name = "HttpCurl__progress_callback"]

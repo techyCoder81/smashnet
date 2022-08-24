@@ -106,7 +106,7 @@ impl HttpCurl for Curler {
         return Curler{callback: None, curl: curl_handle as u64};
     }
     #[export_name = "HttpCurl__is_valid"]
-    extern "Rust" fn is_valid(&mut self) -> Result<&mut Self, u64> {
+    extern "Rust" fn is_valid(&mut self) -> Result<&mut Curler, u64> {
         let curl = self.curl as *mut CURL;
         if curl.is_null() {
             let error = format!("curl failed to initialize! Pointer value: {:p}", curl);
