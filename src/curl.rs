@@ -148,7 +148,8 @@ pub fn try_curl_maidenless(
     println!("starting maidenless curl");
     
         unsafe {
-            let ptr = [url, "\0"].concat();
+            let cstr = [url, "\0"].concat();
+            let ptr = cstr.as_str().as_ptr();
             println!("initializing curl...");
             let curl = easy_init();
             println!("Curl init return value: {:p}", curl);
@@ -158,7 +159,7 @@ pub fn try_curl_maidenless(
             } else {
                 println!("curl is initialized, beginning options");
                 let header = slist_append(std::ptr::null_mut(), "Accept: application/octet-stream\0".as_ptr());
-                curle!(easy_setopt(curl, curl_sys::CURLOPT_URL, ptr.as_str().as_ptr()))?;
+                curle!(easy_setopt(curl, curl_sys::CURLOPT_URL, ptr))?;
                 curle!(easy_setopt(curl, curl_sys::CURLOPT_HTTPHEADER, header))?;
                 curle!(easy_setopt(curl, curl_sys::CURLOPT_FOLLOWLOCATION, 1u64))?;
                 curle!(easy_setopt(curl, curl_sys::CURLOPT_WRITEDATA, writer))?;
