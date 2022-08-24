@@ -1,7 +1,6 @@
 use std::{io::{BufWriter, Write}, fs::File, sync::mpsc::Sender};
 use skyline::libc::*;
 use std::arch::asm;
-use online::sync::check;
 use curl_sys::CURL;
 use std::error::Error;
 use std::path::Path;
