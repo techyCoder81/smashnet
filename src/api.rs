@@ -3,7 +3,9 @@ use crate::types::*;
 extern "Rust" {
     // HttpCurl
     #[link_name = "HttpCurl__new"]
-    fn HttpCurl__new() -> Result<Curler, ()>;
+    fn HttpCurl__new() -> Curler;
+    #[link_name = "HttpCurl__is_valid"]
+    fn HttpCurl__is_valid(curler: &Curler) -> Result<&mut Curler, u64>;
     #[link_name = "HttpCurl__download"]
     fn HttpCurl__download(curler: &Curler, url: String, location: String) -> Result<(), u32>;
     #[link_name = "HttpCurl__progress_callback"]
@@ -15,15 +17,16 @@ extern "Rust" {
 }
 
 impl HttpCurl for Curler {
-    fn new() -> Result<Self, ()> {
-        println!("Checking if smashnet is available");
-        if (HttpCurl__new as *const ()).is_null() {
-            println!("smashnet is not installed! Please install smashnet.nro!");
-            Err(())
-        }
+    fn new() -> Self {
         println!("running exported new()");
         unsafe {
-            Ok(HttpCurl__new())
+            HttpCurl__new()
+        }
+    }
+    fn is_valid(&mut self) -> Result<&mut Self, u64> {
+        println!("running exported is_valid()");
+        unsafe {
+            HttpCurl__is_valid(self)
         }
     }
     fn download(&mut self, url: String, location: String) -> Result<(), u32> {
