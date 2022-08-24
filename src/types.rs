@@ -3,7 +3,7 @@ pub struct Curler {
     pub curl: u64,
 }
 
-pub trait HttpCurl {
+trait HttpCurl {
     fn new() -> Self;
     fn is_valid(&mut self) -> Result<&mut Self, u64>;
     fn download(&mut self, url: String, location: String) -> Result<(), u32>;
