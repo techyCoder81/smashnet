@@ -9,16 +9,16 @@ use std::{io::{BufWriter, Write}, fs::File, path::Path};
 
 // this package is the curl implementation
 #[cfg(not(feature = "dynamic"))]
-use crate::curl::*;
+pub use crate::curl::*;
 
 // use types no matter what
-use crate::types::*;
+pub use crate::types::*;
 
 // this package is the plugin api (the extern api)
 #[cfg(feature = "dynamic")]
 pub mod api;
 #[cfg(feature = "dynamic")]
-use crate::api::*;
+pub use crate::api::*;
 
 #[cfg(not(feature = "dynamic"))]
 mod curl;
