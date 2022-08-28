@@ -16,6 +16,17 @@ extern "Rust" {
     fn Curler__drop(curler: &Curler);
 }
 
+pub fn is_available() -> bool {
+    unsafe {
+        if (HttpCurl__new as *const ()).is_null() {
+          println!("Smashnet is not installed");
+          false
+        } else {
+          true
+        }
+      }
+}
+
 impl HttpCurl for Curler {
     fn new() -> Self {
         println!("running exported new()");
