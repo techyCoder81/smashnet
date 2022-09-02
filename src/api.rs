@@ -16,18 +16,25 @@ extern "Rust" {
     fn Curler__drop(curler: &Curler);
 
     #[link_name = "Smashnet__get"]
-    pub fn get(url: String) -> Result<String, String>;
+    fn Smashnet__get(url: String) -> Result<String, String>;
+}
+
+pub fn get(url: String) -> Result<String, String> {
+    unsafe {
+        if !is_available() {
+            return Err("Smashnet is not available on this machine!".to_string());
+        }
+        return Smashnet__get(url);
+    }
 }
 
 pub fn is_available() -> bool {
-    unsafe {
-        if (HttpCurl__new as *const ()).is_null() {
-          println!("Smashnet is not installed");
-          false
-        } else {
-          true
-        }
-      }
+    if (HttpCurl__new as *const ()).is_null() {
+        println!("Smashnet is not installed");
+        false
+    } else {
+        true
+    }
 }
 
 impl HttpCurl for Curler {
