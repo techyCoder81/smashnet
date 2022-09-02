@@ -14,6 +14,9 @@ extern "Rust" {
     // Drop for Curler
     #[link_name = "Curler__drop"]
     fn Curler__drop(curler: &Curler);
+
+    #[link_name = "Smashnet__get"]
+    pub fn get(url: String) -> Result<String, String>;
 }
 
 pub fn is_available() -> bool {
