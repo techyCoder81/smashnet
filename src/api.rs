@@ -8,6 +8,10 @@ extern "Rust" {
     fn HttpCurl__is_valid(curler: &Curler) -> Result<&mut Curler, u64>;
     #[link_name = "HttpCurl__download"]
     fn HttpCurl__download(curler: &Curler, url: String, location: String) -> Result<(), u32>;
+    #[link_name = "HttpCurl__get_json"]
+    fn HttpCurl__get_json(&mut self, url: String) -> Result<String, String>{
+    #[link_name = "HttpCurl__get"]
+    fn HttpCurl__get(&mut self, url: String) -> Result<String, String>{
     #[link_name = "HttpCurl__progress_callback"]
     fn HttpCurl__progress_callback(curler: &Curler, callback: fn(f64, f64) -> ()) -> &mut Curler;
 
@@ -17,15 +21,6 @@ extern "Rust" {
 
     #[link_name = "Smashnet__get"]
     fn Smashnet__get(url: String) -> Result<String, String>;
-}
-
-pub fn get(url: String) -> Result<String, String> {
-    unsafe {
-        if !is_available() {
-            return Err("Smashnet is not available on this machine!".to_string());
-        }
-        return Smashnet__get(url);
-    }
 }
 
 pub fn is_available() -> bool {
@@ -54,6 +49,18 @@ impl HttpCurl for Curler {
         println!("running exported download()");
         unsafe {
             HttpCurl__download(self, url, location)
+        }
+    }
+    fn get_json(&mut self, url: String) -> Result<String, String>{
+        println!("running exported get_json!");
+        unsafe {
+            return HttpCurl__get_json(self, url);
+        }
+    }
+    fn get(&mut self, url: String) -> Result<String, String>{
+        println!("running exported get!");
+        unsafe {
+            return HttpCurl__get(self, url);
         }
     }
     fn progress_callback(&mut self, callback: fn(f64, f64) -> ()) -> &mut Self {
