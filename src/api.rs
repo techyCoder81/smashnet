@@ -9,9 +9,9 @@ extern "Rust" {
     #[link_name = "HttpCurl__download"]
     fn HttpCurl__download(curler: &Curler, url: String, location: String) -> Result<(), u32>;
     #[link_name = "HttpCurl__get_json"]
-    fn HttpCurl__get_json(&mut self, url: String) -> Result<String, String>{
+    fn HttpCurl__get_json(&mut self, url: String) -> Result<String, String>;
     #[link_name = "HttpCurl__get"]
-    fn HttpCurl__get(&mut self, url: String) -> Result<String, String>{
+    fn HttpCurl__get(&mut self, url: String) -> Result<String, String>;
     #[link_name = "HttpCurl__progress_callback"]
     fn HttpCurl__progress_callback(curler: &Curler, callback: fn(f64, f64) -> ()) -> &mut Curler;
 
