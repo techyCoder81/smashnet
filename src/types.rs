@@ -1,3 +1,4 @@
+/// this MUST align withe HttpCurl defined in the smashnet main package!
 pub struct Curler {
     pub callback: Option<fn(f64, f64) -> ()>,
     pub curl: u64,

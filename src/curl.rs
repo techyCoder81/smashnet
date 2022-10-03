@@ -3,7 +3,7 @@ use skyline::libc::*;
 use std::arch::asm;
 use std::error::Error;
 use std::path::Path;
-use crate::types::HttpCurl;
+use crate::types::*;
 use crate::*;
 use crate::curl_consts::HandleCode;
 
@@ -97,11 +97,7 @@ macro_rules! curle {
     }}
 }
 
-/// this MUST align withe HttpCurl defined in the smashnet main package!
-pub struct Curler {
-    pub callback: Option<fn(f64, f64) -> ()>,
-    pub curl: u64,
-}
+
 
 impl HttpCurl for Curler {
 
