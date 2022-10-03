@@ -9,6 +9,6 @@ use smashnet::types::*;
 pub fn main() {
   Curler::new()
     .progress_callback(|progress, total| println!("Progress: {}", progress/total))
-    .download("https://github.com/techyCoder81/smashnet-nro/releases/download/nightly/checksum.txt")?
+    .download("https://github.com/techyCoder81/smashnet-nro/releases/download/nightly/checksum.txt");
 }
 ```
