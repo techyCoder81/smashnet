@@ -7,15 +7,6 @@
 #![feature(c_variadic)]
 use std::{io::{BufWriter, Write}, fs::File, path::Path};
 
-#[cfg(not(feature = "nro"))]
-pub mod api;
-
-mod types;
-pub use types::HttpCurl;
-#[cfg(not(feature = "nro"))]
-pub use types::Curler;
-
-// this package is the plugin api (the extern api)
-
-#[cfg(not(feature = "nro"))]
-pub use api::*;
+pub mod types;
+pub mod curl;
+pub mod curl_consts;

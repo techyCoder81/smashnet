@@ -1,0 +1,408 @@
+#![allow(non_upper_case_globals)]
+#[allow(non_snake_case)]
+#[allow(non_camel_case_types)]
+
+/// these values are borrowed from curl-sys
+pub type CURLoption = u32;
+
+pub const CURLOPTTYPE_LONG: CURLoption = 0;
+pub const CURLOPTTYPE_OBJECTPOINT: CURLoption = 10_000;
+pub const CURLOPTTYPE_FUNCTIONPOINT: CURLoption = 20_000;
+pub const CURLOPTTYPE_OFF_T: CURLoption = 30_000;
+pub const CURLOPTTYPE_BLOB: CURLoption = 40_000;
+const CURLOPTTYPE_VALUES: CURLoption = CURLOPTTYPE_LONG;
+
+pub const CURLOPT_FILE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 1;
+pub const CURLOPT_URL: CURLoption = CURLOPTTYPE_OBJECTPOINT + 2;
+pub const CURLOPT_PORT: CURLoption = CURLOPTTYPE_LONG + 3;
+pub const CURLOPT_PROXY: CURLoption = CURLOPTTYPE_OBJECTPOINT + 4;
+pub const CURLOPT_USERPWD: CURLoption = CURLOPTTYPE_OBJECTPOINT + 5;
+pub const CURLOPT_PROXYUSERPWD: CURLoption = CURLOPTTYPE_OBJECTPOINT + 6;
+pub const CURLOPT_RANGE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 7;
+pub const CURLOPT_INFILE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 9;
+pub const CURLOPT_ERRORBUFFER: CURLoption = CURLOPTTYPE_OBJECTPOINT + 10;
+pub const CURLOPT_WRITEFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 11;
+pub const CURLOPT_READFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 12;
+pub const CURLOPT_TIMEOUT: CURLoption = CURLOPTTYPE_LONG + 13;
+pub const CURLOPT_INFILESIZE: CURLoption = CURLOPTTYPE_LONG + 14;
+pub const CURLOPT_POSTFIELDS: CURLoption = CURLOPTTYPE_OBJECTPOINT + 15;
+pub const CURLOPT_REFERER: CURLoption = CURLOPTTYPE_OBJECTPOINT + 16;
+pub const CURLOPT_FTPPORT: CURLoption = CURLOPTTYPE_OBJECTPOINT + 17;
+pub const CURLOPT_USERAGENT: CURLoption = CURLOPTTYPE_OBJECTPOINT + 18;
+pub const CURLOPT_LOW_SPEED_LIMIT: CURLoption = CURLOPTTYPE_LONG + 19;
+pub const CURLOPT_LOW_SPEED_TIME: CURLoption = CURLOPTTYPE_LONG + 20;
+pub const CURLOPT_RESUME_FROM: CURLoption = CURLOPTTYPE_LONG + 21;
+pub const CURLOPT_COOKIE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 22;
+pub const CURLOPT_HTTPHEADER: CURLoption = CURLOPTTYPE_OBJECTPOINT + 23;
+pub const CURLOPT_HTTPPOST: CURLoption = CURLOPTTYPE_OBJECTPOINT + 24;
+pub const CURLOPT_SSLCERT: CURLoption = CURLOPTTYPE_OBJECTPOINT + 25;
+pub const CURLOPT_KEYPASSWD: CURLoption = CURLOPTTYPE_OBJECTPOINT + 26;
+pub const CURLOPT_CRLF: CURLoption = CURLOPTTYPE_LONG + 27;
+pub const CURLOPT_QUOTE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 28;
+pub const CURLOPT_WRITEHEADER: CURLoption = CURLOPTTYPE_OBJECTPOINT + 29;
+pub const CURLOPT_COOKIEFILE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 31;
+pub const CURLOPT_SSLVERSION: CURLoption = CURLOPTTYPE_LONG + 32;
+pub const CURLOPT_TIMECONDITION: CURLoption = CURLOPTTYPE_LONG + 33;
+pub const CURLOPT_TIMEVALUE: CURLoption = CURLOPTTYPE_LONG + 34;
+pub const CURLOPT_CUSTOMREQUEST: CURLoption = CURLOPTTYPE_OBJECTPOINT + 36;
+pub const CURLOPT_STDERR: CURLoption = CURLOPTTYPE_OBJECTPOINT + 37;
+pub const CURLOPT_POSTQUOTE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 39;
+pub const CURLOPT_WRITEINFO: CURLoption = CURLOPTTYPE_OBJECTPOINT + 40;
+pub const CURLOPT_VERBOSE: CURLoption = CURLOPTTYPE_LONG + 41;
+pub const CURLOPT_HEADER: CURLoption = CURLOPTTYPE_LONG + 42;
+pub const CURLOPT_NOPROGRESS: CURLoption = CURLOPTTYPE_LONG + 43;
+pub const CURLOPT_NOBODY: CURLoption = CURLOPTTYPE_LONG + 44;
+pub const CURLOPT_FAILONERROR: CURLoption = CURLOPTTYPE_LONG + 45;
+pub const CURLOPT_UPLOAD: CURLoption = CURLOPTTYPE_LONG + 46;
+pub const CURLOPT_POST: CURLoption = CURLOPTTYPE_LONG + 47;
+pub const CURLOPT_DIRLISTONLY: CURLoption = CURLOPTTYPE_LONG + 48;
+pub const CURLOPT_APPEND: CURLoption = CURLOPTTYPE_LONG + 50;
+pub const CURLOPT_NETRC: CURLoption = CURLOPTTYPE_LONG + 51;
+pub const CURLOPT_FOLLOWLOCATION: CURLoption = CURLOPTTYPE_LONG + 52;
+pub const CURLOPT_TRANSFERTEXT: CURLoption = CURLOPTTYPE_LONG + 53;
+pub const CURLOPT_PUT: CURLoption = CURLOPTTYPE_LONG + 54;
+pub const CURLOPT_PROGRESSFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 56;
+pub const CURLOPT_PROGRESSDATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 57;
+pub const CURLOPT_AUTOREFERER: CURLoption = CURLOPTTYPE_LONG + 58;
+pub const CURLOPT_PROXYPORT: CURLoption = CURLOPTTYPE_LONG + 59;
+pub const CURLOPT_POSTFIELDSIZE: CURLoption = CURLOPTTYPE_LONG + 60;
+pub const CURLOPT_HTTPPROXYTUNNEL: CURLoption = CURLOPTTYPE_LONG + 61;
+pub const CURLOPT_INTERFACE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 62;
+pub const CURLOPT_KRBLEVEL: CURLoption = CURLOPTTYPE_OBJECTPOINT + 63;
+pub const CURLOPT_SSL_VERIFYPEER: CURLoption = CURLOPTTYPE_LONG + 64;
+pub const CURLOPT_CAINFO: CURLoption = CURLOPTTYPE_OBJECTPOINT + 65;
+pub const CURLOPT_MAXREDIRS: CURLoption = CURLOPTTYPE_LONG + 68;
+pub const CURLOPT_FILETIME: CURLoption = CURLOPTTYPE_LONG + 69;
+pub const CURLOPT_TELNETOPTIONS: CURLoption = CURLOPTTYPE_OBJECTPOINT + 70;
+pub const CURLOPT_MAXCONNECTS: CURLoption = CURLOPTTYPE_LONG + 71;
+pub const CURLOPT_CLOSEPOLICY: CURLoption = CURLOPTTYPE_LONG + 72;
+pub const CURLOPT_FRESH_CONNECT: CURLoption = CURLOPTTYPE_LONG + 74;
+pub const CURLOPT_FORBID_REUSE: CURLoption = CURLOPTTYPE_LONG + 75;
+pub const CURLOPT_RANDOM_FILE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 76;
+pub const CURLOPT_EGDSOCKET: CURLoption = CURLOPTTYPE_OBJECTPOINT + 77;
+pub const CURLOPT_CONNECTTIMEOUT: CURLoption = CURLOPTTYPE_LONG + 78;
+pub const CURLOPT_HEADERFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 79;
+pub const CURLOPT_HTTPGET: CURLoption = CURLOPTTYPE_LONG + 80;
+pub const CURLOPT_SSL_VERIFYHOST: CURLoption = CURLOPTTYPE_LONG + 81;
+pub const CURLOPT_COOKIEJAR: CURLoption = CURLOPTTYPE_OBJECTPOINT + 82;
+pub const CURLOPT_SSL_CIPHER_LIST: CURLoption = CURLOPTTYPE_OBJECTPOINT + 83;
+pub const CURLOPT_HTTP_VERSION: CURLoption = CURLOPTTYPE_LONG + 84;
+pub const CURLOPT_FTP_USE_EPSV: CURLoption = CURLOPTTYPE_LONG + 85;
+pub const CURLOPT_SSLCERTTYPE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 86;
+pub const CURLOPT_SSLKEY: CURLoption = CURLOPTTYPE_OBJECTPOINT + 87;
+pub const CURLOPT_SSLKEYTYPE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 88;
+pub const CURLOPT_SSLENGINE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 89;
+pub const CURLOPT_SSLENGINE_DEFAULT: CURLoption = CURLOPTTYPE_LONG + 90;
+pub const CURLOPT_DNS_USE_GLOBAL_CACHE: CURLoption = CURLOPTTYPE_LONG + 91;
+pub const CURLOPT_DNS_CACHE_TIMEOUT: CURLoption = CURLOPTTYPE_LONG + 92;
+pub const CURLOPT_PREQUOTE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 93;
+pub const CURLOPT_DEBUGFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 94;
+pub const CURLOPT_DEBUGDATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 95;
+pub const CURLOPT_COOKIESESSION: CURLoption = CURLOPTTYPE_LONG + 96;
+pub const CURLOPT_CAPATH: CURLoption = CURLOPTTYPE_OBJECTPOINT + 97;
+pub const CURLOPT_BUFFERSIZE: CURLoption = CURLOPTTYPE_LONG + 98;
+pub const CURLOPT_NOSIGNAL: CURLoption = CURLOPTTYPE_LONG + 99;
+pub const CURLOPT_SHARE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 100;
+pub const CURLOPT_PROXYTYPE: CURLoption = CURLOPTTYPE_LONG + 101;
+pub const CURLOPT_ACCEPT_ENCODING: CURLoption = CURLOPTTYPE_OBJECTPOINT + 102;
+pub const CURLOPT_PRIVATE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 103;
+pub const CURLOPT_HTTP200ALIASES: CURLoption = CURLOPTTYPE_OBJECTPOINT + 104;
+pub const CURLOPT_UNRESTRICTED_AUTH: CURLoption = CURLOPTTYPE_LONG + 105;
+pub const CURLOPT_FTP_USE_EPRT: CURLoption = CURLOPTTYPE_LONG + 106;
+pub const CURLOPT_HTTPAUTH: CURLoption = CURLOPTTYPE_LONG + 107;
+pub const CURLOPT_SSL_CTX_FUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 108;
+pub const CURLOPT_SSL_CTX_DATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 109;
+pub const CURLOPT_FTP_CREATE_MISSING_DIRS: CURLoption = CURLOPTTYPE_LONG + 110;
+pub const CURLOPT_PROXYAUTH: CURLoption = CURLOPTTYPE_LONG + 111;
+pub const CURLOPT_FTP_RESPONSE_TIMEOUT: CURLoption = CURLOPTTYPE_LONG + 112;
+pub const CURLOPT_IPRESOLVE: CURLoption = CURLOPTTYPE_LONG + 113;
+pub const CURLOPT_MAXFILESIZE: CURLoption = CURLOPTTYPE_LONG + 114;
+pub const CURLOPT_INFILESIZE_LARGE: CURLoption = CURLOPTTYPE_OFF_T + 115;
+pub const CURLOPT_RESUME_FROM_LARGE: CURLoption = CURLOPTTYPE_OFF_T + 116;
+pub const CURLOPT_MAXFILESIZE_LARGE: CURLoption = CURLOPTTYPE_OFF_T + 117;
+pub const CURLOPT_NETRC_FILE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 118;
+pub const CURLOPT_USE_SSL: CURLoption = CURLOPTTYPE_LONG + 119;
+pub const CURLOPT_POSTFIELDSIZE_LARGE: CURLoption = CURLOPTTYPE_OFF_T + 120;
+pub const CURLOPT_TCP_NODELAY: CURLoption = CURLOPTTYPE_LONG + 121;
+pub const CURLOPT_FTPSSLAUTH: CURLoption = CURLOPTTYPE_LONG + 129;
+pub const CURLOPT_IOCTLFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 130;
+pub const CURLOPT_IOCTLDATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 131;
+pub const CURLOPT_FTP_ACCOUNT: CURLoption = CURLOPTTYPE_OBJECTPOINT + 134;
+pub const CURLOPT_COOKIELIST: CURLoption = CURLOPTTYPE_OBJECTPOINT + 135;
+pub const CURLOPT_IGNORE_CONTENT_LENGTH: CURLoption = CURLOPTTYPE_LONG + 136;
+pub const CURLOPT_FTP_SKIP_PASV_IP: CURLoption = CURLOPTTYPE_LONG + 137;
+pub const CURLOPT_FTP_FILEMETHOD: CURLoption = CURLOPTTYPE_LONG + 138;
+pub const CURLOPT_LOCALPORT: CURLoption = CURLOPTTYPE_LONG + 139;
+pub const CURLOPT_LOCALPORTRANGE: CURLoption = CURLOPTTYPE_LONG + 140;
+pub const CURLOPT_CONNECT_ONLY: CURLoption = CURLOPTTYPE_LONG + 141;
+pub const CURLOPT_CONV_FROM_NETWORK_FUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 142;
+pub const CURLOPT_CONV_TO_NETWORK_FUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 143;
+pub const CURLOPT_CONV_FROM_UTF8_FUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 144;
+pub const CURLOPT_MAX_SEND_SPEED_LARGE: CURLoption = CURLOPTTYPE_OFF_T + 145;
+pub const CURLOPT_MAX_RECV_SPEED_LARGE: CURLoption = CURLOPTTYPE_OFF_T + 146;
+pub const CURLOPT_FTP_ALTERNATIVE_TO_USER: CURLoption = CURLOPTTYPE_OBJECTPOINT + 147;
+pub const CURLOPT_SOCKOPTFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 148;
+pub const CURLOPT_SOCKOPTDATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 149;
+pub const CURLOPT_SSL_SESSIONID_CACHE: CURLoption = CURLOPTTYPE_LONG + 150;
+pub const CURLOPT_SSH_AUTH_TYPES: CURLoption = CURLOPTTYPE_LONG + 151;
+pub const CURLOPT_SSH_PUBLIC_KEYFILE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 152;
+pub const CURLOPT_SSH_PRIVATE_KEYFILE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 153;
+pub const CURLOPT_FTP_SSL_CCC: CURLoption = CURLOPTTYPE_LONG + 154;
+pub const CURLOPT_TIMEOUT_MS: CURLoption = CURLOPTTYPE_LONG + 155;
+pub const CURLOPT_CONNECTTIMEOUT_MS: CURLoption = CURLOPTTYPE_LONG + 156;
+pub const CURLOPT_HTTP_TRANSFER_DECODING: CURLoption = CURLOPTTYPE_LONG + 157;
+pub const CURLOPT_HTTP_CONTENT_DECODING: CURLoption = CURLOPTTYPE_LONG + 158;
+pub const CURLOPT_NEW_FILE_PERMS: CURLoption = CURLOPTTYPE_LONG + 159;
+pub const CURLOPT_NEW_DIRECTORY_PERMS: CURLoption = CURLOPTTYPE_LONG + 160;
+pub const CURLOPT_POSTREDIR: CURLoption = CURLOPTTYPE_LONG + 161;
+pub const CURLOPT_SSH_HOST_PUBLIC_KEY_MD5: CURLoption = CURLOPTTYPE_OBJECTPOINT + 162;
+pub const CURLOPT_OPENSOCKETFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 163;
+pub const CURLOPT_OPENSOCKETDATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 164;
+pub const CURLOPT_COPYPOSTFIELDS: CURLoption = CURLOPTTYPE_OBJECTPOINT + 165;
+pub const CURLOPT_PROXY_TRANSFER_MODE: CURLoption = CURLOPTTYPE_LONG + 166;
+pub const CURLOPT_SEEKFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 167;
+pub const CURLOPT_SEEKDATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 168;
+pub const CURLOPT_CRLFILE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 169;
+pub const CURLOPT_ISSUERCERT: CURLoption = CURLOPTTYPE_OBJECTPOINT + 170;
+pub const CURLOPT_ADDRESS_SCOPE: CURLoption = CURLOPTTYPE_LONG + 171;
+pub const CURLOPT_CERTINFO: CURLoption = CURLOPTTYPE_LONG + 172;
+pub const CURLOPT_USERNAME: CURLoption = CURLOPTTYPE_OBJECTPOINT + 173;
+pub const CURLOPT_PASSWORD: CURLoption = CURLOPTTYPE_OBJECTPOINT + 174;
+pub const CURLOPT_PROXYUSERNAME: CURLoption = CURLOPTTYPE_OBJECTPOINT + 175;
+pub const CURLOPT_PROXYPASSWORD: CURLoption = CURLOPTTYPE_OBJECTPOINT + 176;
+pub const CURLOPT_NOPROXY: CURLoption = CURLOPTTYPE_OBJECTPOINT + 177;
+pub const CURLOPT_TFTP_BLKSIZE: CURLoption = CURLOPTTYPE_LONG + 178;
+pub const CURLOPT_SOCKS5_GSSAPI_SERVICE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 179;
+pub const CURLOPT_SOCKS5_GSSAPI_NEC: CURLoption = CURLOPTTYPE_LONG + 180;
+pub const CURLOPT_PROTOCOLS: CURLoption = CURLOPTTYPE_LONG + 181;
+pub const CURLOPT_REDIR_PROTOCOLS: CURLoption = CURLOPTTYPE_LONG + 182;
+pub const CURLOPT_SSH_KNOWNHOSTS: CURLoption = CURLOPTTYPE_OBJECTPOINT + 183;
+pub const CURLOPT_SSH_KEYFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 184;
+pub const CURLOPT_SSH_KEYDATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 185;
+pub const CURLOPT_MAIL_FROM: CURLoption = CURLOPTTYPE_OBJECTPOINT + 186;
+pub const CURLOPT_MAIL_RCPT: CURLoption = CURLOPTTYPE_OBJECTPOINT + 187;
+pub const CURLOPT_FTP_USE_PRET: CURLoption = CURLOPTTYPE_LONG + 188;
+pub const CURLOPT_RTSP_REQUEST: CURLoption = CURLOPTTYPE_LONG + 189;
+pub const CURLOPT_RTSP_SESSION_ID: CURLoption = CURLOPTTYPE_OBJECTPOINT + 190;
+pub const CURLOPT_RTSP_STREAM_URI: CURLoption = CURLOPTTYPE_OBJECTPOINT + 191;
+pub const CURLOPT_RTSP_TRANSPORT: CURLoption = CURLOPTTYPE_OBJECTPOINT + 192;
+pub const CURLOPT_RTSP_CLIENT_CSEQ: CURLoption = CURLOPTTYPE_LONG + 193;
+pub const CURLOPT_RTSP_SERVER_CSEQ: CURLoption = CURLOPTTYPE_LONG + 194;
+pub const CURLOPT_INTERLEAVEDATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 195;
+pub const CURLOPT_INTERLEAVEFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 196;
+pub const CURLOPT_WILDCARDMATCH: CURLoption = CURLOPTTYPE_LONG + 197;
+pub const CURLOPT_CHUNK_BGN_FUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 198;
+pub const CURLOPT_CHUNK_END_FUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 199;
+pub const CURLOPT_FNMATCH_FUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 200;
+pub const CURLOPT_CHUNK_DATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 201;
+pub const CURLOPT_FNMATCH_DATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 202;
+pub const CURLOPT_RESOLVE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 203;
+pub const CURLOPT_TLSAUTH_USERNAME: CURLoption = CURLOPTTYPE_OBJECTPOINT + 204;
+pub const CURLOPT_TLSAUTH_PASSWORD: CURLoption = CURLOPTTYPE_OBJECTPOINT + 205;
+pub const CURLOPT_TLSAUTH_TYPE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 206;
+pub const CURLOPT_TRANSFER_ENCODING: CURLoption = CURLOPTTYPE_LONG + 207;
+pub const CURLOPT_CLOSESOCKETFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 208;
+pub const CURLOPT_CLOSESOCKETDATA: CURLoption = CURLOPTTYPE_OBJECTPOINT + 209;
+pub const CURLOPT_GSSAPI_DELEGATION: CURLoption = CURLOPTTYPE_LONG + 210;
+pub const CURLOPT_DNS_SERVERS: CURLoption = CURLOPTTYPE_OBJECTPOINT + 211;
+// pub const CURLOPT_ACCEPTTIMEOUT_MS: CURLoption = CURLOPTTYPE_LONG + 212;
+pub const CURLOPT_TCP_KEEPALIVE: CURLoption = CURLOPTTYPE_LONG + 213;
+pub const CURLOPT_TCP_KEEPIDLE: CURLoption = CURLOPTTYPE_LONG + 214;
+pub const CURLOPT_TCP_KEEPINTVL: CURLoption = CURLOPTTYPE_LONG + 215;
+pub const CURLOPT_SSL_OPTIONS: CURLoption = CURLOPTTYPE_LONG + 216;
+// pub const CURLOPT_MAIL_AUTH: CURLoption = CURLOPTTYPE_OBJECTPOINT + 217;
+// pub const CURLOPT_SASL_IR: CURLoption = CURLOPTTYPE_LONG + 218;
+// pub const CURLOPT_XFERINFOFUNCTION: CURLoption = CURLOPTTYPE_FUNCTIONPOINT + 219;
+// pub const CURLOPT_XOAUTH2_BEARER: CURLoption = CURLOPTTYPE_OBJECTPOINT + 220;
+// pub const CURLOPT_DNS_INTERFACE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 221;
+// pub const CURLOPT_DNS_LOCAL_IP4: CURLoption = CURLOPTTYPE_OBJECTPOINT + 222;
+// pub const CURLOPT_DNS_LOCAL_IP6: CURLoption = CURLOPTTYPE_OBJECTPOINT + 223;
+// pub const CURLOPT_LOGIN_OPTIONS: CURLoption = CURLOPTTYPE_OBJECTPOINT + 224;
+pub const CURLOPT_EXPECT_100_TIMEOUT_MS: CURLoption = CURLOPTTYPE_LONG + 227;
+pub const CURLOPT_PINNEDPUBLICKEY: CURLoption = CURLOPTTYPE_OBJECTPOINT + 230;
+pub const CURLOPT_UNIX_SOCKET_PATH: CURLoption = CURLOPTTYPE_OBJECTPOINT + 231;
+pub const CURLOPT_PATH_AS_IS: CURLoption = CURLOPTTYPE_LONG + 234;
+pub const CURLOPT_PIPEWAIT: CURLoption = CURLOPTTYPE_LONG + 237;
+pub const CURLOPT_CONNECT_TO: CURLoption = CURLOPTTYPE_OBJECTPOINT + 243;
+pub const CURLOPT_PROXY_CAINFO: CURLoption = CURLOPTTYPE_OBJECTPOINT + 246;
+pub const CURLOPT_PROXY_CAPATH: CURLoption = CURLOPTTYPE_OBJECTPOINT + 247;
+pub const CURLOPT_PROXY_SSL_VERIFYPEER: CURLoption = CURLOPTTYPE_LONG + 248;
+pub const CURLOPT_PROXY_SSL_VERIFYHOST: CURLoption = CURLOPTTYPE_LONG + 249;
+pub const CURLOPT_PROXY_SSLVERSION: CURLoption = CURLOPTTYPE_VALUES + 250;
+pub const CURLOPT_PROXY_SSLCERT: CURLoption = CURLOPTTYPE_OBJECTPOINT + 254;
+pub const CURLOPT_PROXY_SSLCERTTYPE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 255;
+pub const CURLOPT_PROXY_SSLKEY: CURLoption = CURLOPTTYPE_OBJECTPOINT + 256;
+pub const CURLOPT_PROXY_SSLKEYTYPE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 257;
+pub const CURLOPT_PROXY_KEYPASSWD: CURLoption = CURLOPTTYPE_OBJECTPOINT + 258;
+pub const CURLOPT_PROXY_SSL_CIPHER_LIST: CURLoption = CURLOPTTYPE_OBJECTPOINT + 259;
+pub const CURLOPT_PROXY_CRLFILE: CURLoption = CURLOPTTYPE_OBJECTPOINT + 260;
+pub const CURLOPT_PROXY_SSL_OPTIONS: CURLoption = CURLOPTTYPE_LONG + 261;
+
+pub const CURLOPT_DOH_URL: CURLoption = CURLOPTTYPE_OBJECTPOINT + 279;
+pub const CURLOPT_UPLOAD_BUFFERSIZE: CURLoption = CURLOPTTYPE_LONG + 280;
+
+pub const CURLOPT_HTTP09_ALLOWED: CURLoption = CURLOPTTYPE_LONG + 285;
+
+pub const CURLOPT_MAXAGE_CONN: CURLoption = CURLOPTTYPE_LONG + 288;
+
+pub const CURLOPT_SSLCERT_BLOB: CURLoption = CURLOPTTYPE_BLOB + 291;
+pub const CURLOPT_SSLKEY_BLOB: CURLoption = CURLOPTTYPE_BLOB + 292;
+pub const CURLOPT_PROXY_SSLCERT_BLOB: CURLoption = CURLOPTTYPE_BLOB + 293;
+pub const CURLOPT_PROXY_SSLKEY_BLOB: CURLoption = CURLOPTTYPE_BLOB + 294;
+pub const CURLOPT_ISSUERCERT_BLOB: CURLoption = CURLOPTTYPE_BLOB + 295;
+
+pub const CURLOPT_PROXY_ISSUERCERT: CURLoption = CURLOPTTYPE_OBJECTPOINT + 296;
+pub const CURLOPT_PROXY_ISSUERCERT_BLOB: CURLoption = CURLOPTTYPE_BLOB + 297;
+
+pub const CURLOPT_AWS_SIGV4: CURLoption = CURLOPTTYPE_OBJECTPOINT + 305;
+
+pub const CURLOPT_DOH_SSL_VERIFYPEER: CURLoption = CURLOPTTYPE_LONG + 306;
+pub const CURLOPT_DOH_SSL_VERIFYHOST: CURLoption = CURLOPTTYPE_LONG + 307;
+pub const CURLOPT_DOH_SSL_VERIFYSTATUS: CURLoption = CURLOPTTYPE_LONG + 308;
+pub const CURLOPT_CAINFO_BLOB: CURLoption = CURLOPTTYPE_BLOB + 309;
+pub const CURLOPT_PROXY_CAINFO_BLOB: CURLoption = CURLOPTTYPE_BLOB + 310;
+
+
+// Note that the type here is wrong, it's just intended to just be an enum.
+pub const CURL_SSLVERSION_DEFAULT: CURLoption = 0;
+pub const CURL_SSLVERSION_TLSv1: CURLoption = 1;
+pub const CURL_SSLVERSION_SSLv2: CURLoption = 2;
+pub const CURL_SSLVERSION_SSLv3: CURLoption = 3;
+pub const CURL_SSLVERSION_TLSv1_0: CURLoption = 4;
+pub const CURL_SSLVERSION_TLSv1_1: CURLoption = 5;
+pub const CURL_SSLVERSION_TLSv1_2: CURLoption = 6;
+pub const CURL_SSLVERSION_TLSv1_3: CURLoption = 7;
+
+pub const CURLOPT_READDATA: CURLoption = CURLOPT_INFILE;
+pub const CURLOPT_WRITEDATA: CURLoption = CURLOPT_FILE;
+pub const CURLOPT_HEADERDATA: CURLoption = CURLOPT_WRITEHEADER;
+
+#[repr(u32)]
+pub enum HandleCode {
+    CURLE_OK = 0u32,
+    CURLE_UNSUPPORTED_PROTOCOL,    /* 1 */
+    CURLE_FAILED_INIT,             /* 2 */
+    CURLE_URL_MALFORMAT,           /* 3 */
+    CURLE_NOT_BUILT_IN,            /* 4 - [was obsoleted in August 2007 for
+                                      7.17.0, reused in April 2011 for 7.21.5] */
+    CURLE_COULDNT_RESOLVE_PROXY,   /* 5 */
+    CURLE_COULDNT_RESOLVE_HOST,    /* 6 */
+    CURLE_COULDNT_CONNECT,         /* 7 */
+    CURLE_WEIRD_SERVER_REPLY,      /* 8 */
+    CURLE_REMOTE_ACCESS_DENIED,    /* 9 a service was denied by the server
+                                      due to lack of access - when login fails
+                                      this is not returned. */
+    CURLE_FTP_ACCEPT_FAILED,       /* 10 - [was obsoleted in April 2006 for
+                                      7.15.4, reused in Dec 2011 for 7.24.0]*/
+    CURLE_FTP_WEIRD_PASS_REPLY,    /* 11 */
+    CURLE_FTP_ACCEPT_TIMEOUT,      /* 12 - timeout occurred accepting server
+                                      [was obsoleted in August 2007 for 7.17.0,
+                                      reused in Dec 2011 for 7.24.0]*/
+    CURLE_FTP_WEIRD_PASV_REPLY,    /* 13 */
+    CURLE_FTP_WEIRD_227_FORMAT,    /* 14 */
+    CURLE_FTP_CANT_GET_HOST,       /* 15 */
+    CURLE_HTTP2,                   /* 16 - A problem in the http2 framing layer.
+                                      [was obsoleted in August 2007 for 7.17.0,
+                                      reused in July 2014 for 7.38.0] */
+    CURLE_FTP_COULDNT_SET_TYPE,    /* 17 */
+    CURLE_PARTIAL_FILE,            /* 18 */
+    CURLE_FTP_COULDNT_RETR_FILE,   /* 19 */
+    CURLE_OBSOLETE20,              /* 20 - NOT USED */
+    CURLE_QUOTE_ERROR,             /* 21 - quote command failure */
+    CURLE_HTTP_RETURNED_ERROR,     /* 22 */
+    CURLE_WRITE_ERROR,             /* 23 */
+    CURLE_OBSOLETE24,              /* 24 - NOT USED */
+    CURLE_UPLOAD_FAILED,           /* 25 - failed upload "command" */
+    CURLE_READ_ERROR,              /* 26 - couldn't open/read from file */
+    CURLE_OUT_OF_MEMORY,           /* 27 */
+    CURLE_OPERATION_TIMEDOUT,      /* 28 - the timeout time was reached */
+    CURLE_OBSOLETE29,              /* 29 - NOT USED */
+    CURLE_FTP_PORT_FAILED,         /* 30 - FTP PORT operation failed */
+    CURLE_FTP_COULDNT_USE_REST,    /* 31 - the REST command failed */
+    CURLE_OBSOLETE32,              /* 32 - NOT USED */
+    CURLE_RANGE_ERROR,             /* 33 - RANGE "command" didn't work */
+    CURLE_HTTP_POST_ERROR,         /* 34 */
+    CURLE_SSL_CONNECT_ERROR,       /* 35 - wrong when connecting with SSL */
+    CURLE_BAD_DOWNLOAD_RESUME,     /* 36 - couldn't resume download */
+    CURLE_FILE_COULDNT_READ_FILE,  /* 37 */
+    CURLE_LDAP_CANNOT_BIND,        /* 38 */
+    CURLE_LDAP_SEARCH_FAILED,      /* 39 */
+    CURLE_OBSOLETE40,              /* 40 - NOT USED */
+    CURLE_FUNCTION_NOT_FOUND,      /* 41 - NOT USED starting with 7.53.0 */
+    CURLE_ABORTED_BY_CALLBACK,     /* 42 */
+    CURLE_BAD_FUNCTION_ARGUMENT,   /* 43 */
+    CURLE_OBSOLETE44,              /* 44 - NOT USED */
+    CURLE_INTERFACE_FAILED,        /* 45 - CURLOPT_INTERFACE failed */
+    CURLE_OBSOLETE46,              /* 46 - NOT USED */
+    CURLE_TOO_MANY_REDIRECTS,      /* 47 - catch endless re-direct loops */
+    CURLE_UNKNOWN_OPTION,          /* 48 - User specified an unknown option */
+    CURLE_SETOPT_OPTION_SYNTAX,    /* 49 - Malformed setopt option */
+    CURLE_OBSOLETE50,              /* 50 - NOT USED */
+    CURLE_OBSOLETE51,              /* 51 - NOT USED */
+    CURLE_GOT_NOTHING,             /* 52 - when this is a specific error */
+    CURLE_SSL_ENGINE_NOTFOUND,     /* 53 - SSL crypto engine not found */
+    CURLE_SSL_ENGINE_SETFAILED,    /* 54 - can not set SSL crypto engine as
+                                      default */
+    CURLE_SEND_ERROR,              /* 55 - failed sending network data */
+    CURLE_RECV_ERROR,              /* 56 - failure in receiving network data */
+    CURLE_OBSOLETE57,              /* 57 - NOT IN USE */
+    CURLE_SSL_CERTPROBLEM,         /* 58 - problem with the local certificate */
+    CURLE_SSL_CIPHER,              /* 59 - couldn't use specified cipher */
+    CURLE_PEER_FAILED_VERIFICATION, /* 60 - peer's certificate or fingerprint
+                                       wasn't verified fine */
+    CURLE_BAD_CONTENT_ENCODING,    /* 61 - Unrecognized/bad encoding */
+    CURLE_OBSOLETE62,              /* 62 - NOT IN USE since 7.82.0 */
+    CURLE_FILESIZE_EXCEEDED,       /* 63 - Maximum file size exceeded */
+    CURLE_USE_SSL_FAILED,          /* 64 - Requested FTP SSL level failed */
+    CURLE_SEND_FAIL_REWIND,        /* 65 - Sending the data requires a rewind
+                                      that failed */
+    CURLE_SSL_ENGINE_INITFAILED,   /* 66 - failed to initialise ENGINE */
+    CURLE_LOGIN_DENIED,            /* 67 - user, password or similar was not
+                                      accepted and we failed to login */
+    CURLE_TFTP_NOTFOUND,           /* 68 - file not found on server */
+    CURLE_TFTP_PERM,               /* 69 - permission problem on server */
+    CURLE_REMOTE_DISK_FULL,        /* 70 - out of disk space on server */
+    CURLE_TFTP_ILLEGAL,            /* 71 - Illegal TFTP operation */
+    CURLE_TFTP_UNKNOWNID,          /* 72 - Unknown transfer ID */
+    CURLE_REMOTE_FILE_EXISTS,      /* 73 - File already exists */
+    CURLE_TFTP_NOSUCHUSER,         /* 74 - No such user */
+    CURLE_CONV_FAILED,             /* 75 - conversion failed */
+    CURLE_OBSOLETE76,              /* 76 - NOT IN USE since 7.82.0 */
+    CURLE_SSL_CACERT_BADFILE,      /* 77 - could not load CACERT file, missing
+                                      or wrong format */
+    CURLE_REMOTE_FILE_NOT_FOUND,   /* 78 - remote file not found */
+    CURLE_SSH,                     /* 79 - error from the SSH layer, somewhat
+                                      generic so the error message will be of
+                                      interest when this has happened */
+  
+    CURLE_SSL_SHUTDOWN_FAILED,     /* 80 - Failed to shut down the SSL
+                                      connection */
+    CURLE_AGAIN,                   /* 81 - socket is not ready for send/recv,
+                                      wait till it's ready and try again (Added
+                                      in 7.18.2) */
+    CURLE_SSL_CRL_BADFILE,         /* 82 - could not load CRL file, missing or
+                                      wrong format (Added in 7.19.0) */
+    CURLE_SSL_ISSUER_ERROR,        /* 83 - Issuer check failed.  (Added in
+                                      7.19.0) */
+    CURLE_FTP_PRET_FAILED,         /* 84 - a PRET command failed */
+    CURLE_RTSP_CSEQ_ERROR,         /* 85 - mismatch of RTSP CSeq numbers */
+    CURLE_RTSP_SESSION_ERROR,      /* 86 - mismatch of RTSP Session Ids */
+    CURLE_FTP_BAD_FILE_LIST,       /* 87 - unable to parse FTP file list */
+    CURLE_CHUNK_FAILED,            /* 88 - chunk callback reported error */
+    CURLE_NO_CONNECTION_AVAILABLE, /* 89 - No connection available, the
+                                      session will be queued */
+    CURLE_SSL_PINNEDPUBKEYNOTMATCH, /* 90 - specified pinned public key did not
+                                       match */
+    CURLE_SSL_INVALIDCERTSTATUS,   /* 91 - invalid certificate status */
+    CURLE_HTTP2_STREAM,            /* 92 - stream error in HTTP/2 framing layer
+                                      */
+    CURLE_RECURSIVE_API_CALL,      /* 93 - an api function was called from
+                                      inside a callback */
+    CURLE_AUTH_ERROR,              /* 94 - an authentication function returned an
+                                      error */
+    CURLE_HTTP3,                   /* 95 - An HTTP/3 layer problem */
+    CURLE_QUIC_CONNECT_ERROR,      /* 96 - QUIC connection error */
+    CURLE_PROXY,                   /* 97 - proxy handshake error */
+    CURLE_SSL_CLIENTCERT,          /* 98 - client-side certificate required */
+    CURL_LAST /* never use! */
+  }

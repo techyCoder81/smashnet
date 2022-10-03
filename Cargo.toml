@@ -12,7 +12,6 @@ skyline = { git = "https://github.com/ultimate-research/skyline-rs.git" }
 
 
 [features]
-nro = []
 
 [profile.dev]
 panic = "abort"
