@@ -2,7 +2,7 @@
 This is a crate which exposes GET request and download functionality for smash ultimate plugins. Instead of using minreq, which is slow due to lack of openssl impl for the switch, and which also requires devkitpro, this crate allows you to make get requests and download files using the game's own statically linked libcurl, which is offset hooked as necessary when `Curler::new()` is used.
 
 ## Example usage:
-```
+```rust
 use smashnet::types::*;
 
 #[skyline::main(name = "your-plugin-here")]
