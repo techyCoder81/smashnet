@@ -100,26 +100,14 @@ macro_rules! curle {
 
 
 impl HttpCurl for Curler {
-
-    #[export_name = "HttpCurl__new"]
+    /// creates a new curler
     extern "Rust" fn new() -> Self { 
         install_curl();
         let curl_handle = unsafe { easy_init() };
         return Curler{callback: None, curl: curl_handle as u64};
     }
-    #[export_name = "HttpCurl__is_valid"]
-    extern "Rust" fn is_valid(&mut self) -> Result<&mut Curler, u64> {
-        let curl = self.curl as *mut CurlHandle;
-        if curl.is_null() {
-            let error = format!("curl failed to initialize! Pointer value: {:p}", curl);
-            println!("{}", error);
-            return Err(self.curl);
-        }
-        return Ok(self);
-    }
 
     /// download a file from the given url to the given location
-    #[export_name = "HttpCurl__download"]
     extern "Rust" fn download(&mut self, url: String, location: String) -> Result<(), u32>{
         // change thread to high priority
         //unsafe {
@@ -197,32 +185,7 @@ impl HttpCurl for Curler {
         Ok(())
     }
 
-    /// GET json from the given url
-    #[export_name = "HttpCurl__get_json"]
-    extern "Rust" fn get_json(&mut self, url: String) -> Result<String, String>{
-        let tick = unsafe {skyline::nn::os::GetSystemTick() as usize};
-        fs::create_dir_all("sd:/downloads");
-        let location = format!("sd:/downloads/{}.json", tick);
-        match self.download(url, location.clone()) {
-            Ok(()) => println!("json GET ok!"),
-            Err(e) => {
-                let error = format!("{}", e);
-                return Err(error);
-            }
-        }
-        let json = match std::fs::read_to_string(&location){
-            Ok(text) => text,
-            Err(e) => {
-                let error = format!("{}", e);
-                return Err(error);
-            }
-        };
-        std::fs::remove_file(&location);
-        return Ok(json);
-    }
-
     /// GET text from the given url
-    #[export_name = "HttpCurl__get"]
     extern "Rust" fn get(&mut self, url: String) -> Result<String, String>{
         let tick = unsafe {skyline::nn::os::GetSystemTick() as usize};
         fs::create_dir_all("sd:/downloads");
@@ -245,17 +208,13 @@ impl HttpCurl for Curler {
         return Ok(str);
     }
 
-    #[export_name = "HttpCurl__progress_callback"]
     extern "Rust" fn progress_callback(&mut self, function: fn(f64, f64) -> ()) -> &mut Self {
         self.callback = Some(function);
         self
     }
-
-    
 }
 
 impl Drop for Curler {
-    #[export_name = "Curler__drop"]
     extern "Rust" fn drop(&mut self) {
         let curl = self.curl as *mut CurlHandle;
         if !curl.is_null() {
