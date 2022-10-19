@@ -9,6 +9,11 @@ use crate::curl_consts::HandleCode;
 
 pub struct CurlHandle;
 
+pub struct curl_slist {
+    pub data: *mut c_char,
+    pub next: *mut curl_slist,
+}
+
 #[skyline::hook(offset = 0x6aa8, inline)]
 pub unsafe fn curl_log_hook(ctx: &skyline::hooks::InlineCtx) {
     let str_ptr;
@@ -37,8 +42,8 @@ pub unsafe extern "C" fn global_init_mem(
     calloc: unsafe extern "C" fn(usize, usize) -> *mut c_void
 ) -> u64;
 
-//#[skyline::from_offset(0x16c00)]
-//pub unsafe extern "C" fn slist_append(slist: *mut curl_sys::curl_slist, header: *const u8) -> *mut curl_sys::curl_slist;
+#[skyline::from_offset(0x16c00)]
+pub unsafe extern "C" fn slist_append(slist: *mut curl_slist, header: *const u8) -> u64;
 
 #[skyline::from_offset(0x960)]
 pub unsafe extern "C" fn easy_init() -> *mut CurlHandle;
@@ -221,9 +226,9 @@ impl HttpCurl for Curler {
             let ptr = cstr.as_str().as_ptr();
             let curl = self.curl as *mut CurlHandle;
             println!("curl is initialized, beginning options");
-            //let header = slist_append(std::ptr::null_mut(), "Accept: application/octet-stream\0".as_ptr());
+            let header = slist_append(std::ptr::null_mut(), "Accept: application/octet-stream\0".as_ptr());
             curle!(easy_setopt(curl, curl_consts::CURLOPT_URL, ptr))?;
-            //curle!(easy_setopt(curl, curl_consts::CURLOPT_HTTPHEADER, header))?;
+            curle!(easy_setopt(curl, curl_consts::CURLOPT_HTTPHEADER, header))?;
             curle!(easy_setopt(curl, curl_consts::CURLOPT_FOLLOWLOCATION, 1u64))?;
             curle!(easy_setopt(curl, curl_consts::CURLOPT_WRITEDATA, &mut writer))?;
             curle!(easy_setopt(curl, curl_consts::CURLOPT_WRITEFUNCTION, write_fn_data as *const ()))?;
