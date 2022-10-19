@@ -77,6 +77,12 @@ unsafe extern "C" fn write_fn(data: *const u8, data_size: usize, data_count: usi
     true_size
 }
 
+unsafe extern "C" fn write_fn_data(data: *const u8, data_size: usize, data_count: usize, writer: &mut BufWriter<&mut Vec<u8>>) -> usize {
+    let true_size = data_size * data_count;
+    let slice = std::slice::from_raw_parts(data, true_size);
+    let _ = writer.write(slice);
+    true_size
+}
 /// private internal callback handler
 unsafe extern "C" fn callback_internal(callback: extern fn(f64, f64) -> (), dl_total: f64, dl_now: f64, ul_total: f64, ul_now: f64) -> usize {
     //println!("callback is called: {:p}", callback);
@@ -206,6 +212,48 @@ impl HttpCurl for Curler {
         };
         std::fs::remove_file(&location);
         return Ok(str);
+    }
+
+    extern "Rust" fn get_bytes(&mut self, url: String, out_buf: &mut Vec<u8>) -> Result<(), u32> {
+        let mut writer = BufWriter::with_capacity(0x40_000,  out_buf);
+        unsafe {
+            let cstr = [url.as_str(), "\0"].concat();
+            let ptr = cstr.as_str().as_ptr();
+            let curl = self.curl as *mut CurlHandle;
+            println!("curl is initialized, beginning options");
+            //let header = slist_append(std::ptr::null_mut(), "Accept: application/octet-stream\0".as_ptr());
+            curle!(easy_setopt(curl, curl_consts::CURLOPT_URL, ptr))?;
+            //curle!(easy_setopt(curl, curl_consts::CURLOPT_HTTPHEADER, header))?;
+            curle!(easy_setopt(curl, curl_consts::CURLOPT_FOLLOWLOCATION, 1u64))?;
+            curle!(easy_setopt(curl, curl_consts::CURLOPT_WRITEDATA, &mut writer))?;
+            curle!(easy_setopt(curl, curl_consts::CURLOPT_WRITEFUNCTION, write_fn_data as *const ()))?;
+            curle!(easy_setopt(curl, curl_consts::CURLOPT_FAILONERROR, 1u64))?;
+       
+            match self.callback {
+                Some(function) => {
+                    curle!(easy_setopt(curl, curl_consts::CURLOPT_NOPROGRESS, 0u64))?;
+                    curle!(easy_setopt(curl, curl_consts::CURLOPT_PROGRESSDATA, function as *const ()))?;
+                    curle!(easy_setopt(curl, curl_consts::CURLOPT_PROGRESSFUNCTION, callback_internal as *const ()))?;
+                },
+                None => curle!(easy_setopt(curl, curl_consts::CURLOPT_NOPROGRESS, 1u64))?,
+            }
+            curle!(easy_setopt(curl, curl_consts::CURLOPT_NOSIGNAL, 1u64))?;
+            curle!(easy_setopt(curl, curl_consts::CURLOPT_SSL_CTX_FUNCTION, curl_ssl_ctx_callback as *const ()))?;
+            curle!(easy_setopt(curl, curl_consts::CURLOPT_USERAGENT, "smashnet\0".as_ptr()))?;
+            println!("beginning download.");
+            match curle!(easy_perform(curl)){
+                Ok(()) => println!("curl success?"),
+                Err(e) => {
+                    println!("Error during curl: {}", e);
+                    return Err(e);
+                } 
+            };
+        }
+
+        println!("flushing writer");
+        writer.flush();
+        return Ok(());
+
     }
 
     extern "Rust" fn progress_callback(&mut self, function: fn(f64, f64) -> ()) -> &mut Self {
