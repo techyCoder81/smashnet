@@ -14,12 +14,12 @@ pub struct curl_slist {
     pub next: *mut curl_slist,
 }
 
-#[skyline::hook(offset = 0x6aa8, inline)]
-pub unsafe fn curl_log_hook(ctx: &skyline::hooks::InlineCtx) {
-    let str_ptr;
-    asm!("ldr {}, [x29, #0x18]", out(reg) str_ptr);
+//#[skyline::hook(offset = 0x6aa8, inline)]
+//pub unsafe fn curl_log_hook(ctx: &skyline::hooks::InlineCtx) {
+    //let str_ptr;
+    //asm!("ldr {}, [x29, #0x18]", out(reg) str_ptr);
     // println!("{}", skyline::from_c_str(str_ptr));
-}
+//}
 
 #[skyline::hook(offset = 0x27ac0, inline)]
 pub unsafe fn libcurl_resolver_thread_stack_size_set(ctx: &mut skyline::hooks::InlineCtx) {
