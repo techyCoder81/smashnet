@@ -3,6 +3,11 @@ name = "smashnet"
 version = "0.1.0"
 authors = []
 edition = "2018"
+license = "Apache-2.0"
+description = "A Rust crate which hooks Smash Ultimate's libcurl in order to perform https operations."
+readme = "README.md"
+repository = "https://github.com/techyCoder81/smashnet"
+
 
 [package.metadata.skyline]
 titleid = "01006A800016E000"
