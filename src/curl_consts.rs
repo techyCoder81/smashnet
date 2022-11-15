@@ -277,6 +277,7 @@ pub const CURLOPT_READDATA: CURLoption = CURLOPT_INFILE;
 pub const CURLOPT_WRITEDATA: CURLoption = CURLOPT_FILE;
 pub const CURLOPT_HEADERDATA: CURLoption = CURLOPT_WRITEHEADER;
 
+#[derive(Debug, PartialEq)]
 #[repr(u32)]
 pub enum HandleCode {
     CURLE_OK = 0u32,

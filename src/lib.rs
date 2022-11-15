@@ -7,6 +7,5 @@
 #![feature(c_variadic)]
 use std::{io::{BufWriter, Write}, fs::File, path::Path};
 
-pub mod types;
 pub mod curl;
 pub mod curl_consts;

@@ -3,7 +3,6 @@ use skyline::libc::*;
 use std::arch::asm;
 use std::error::Error;
 use std::path::Path;
-use crate::types::*;
 use crate::*;
 use crate::curl_consts::HandleCode;
 
@@ -89,10 +88,10 @@ unsafe extern "C" fn write_fn_data(data: *const u8, data_size: usize, data_count
     true_size
 }
 /// private internal callback handler
-unsafe extern "C" fn callback_internal(callback: extern fn(f64, f64) -> (), dl_total: f64, dl_now: f64, ul_total: f64, ul_now: f64) -> usize {
+unsafe extern "C" fn callback_internal(curler: &Curler, dl_total: f64, dl_now: f64, ul_total: f64, ul_now: f64) -> usize {
     //println!("callback is called: {:p}", callback);
-    if dl_total != 0.0 {
-        callback(dl_total, dl_now);
+    if dl_total != 0.0 && (dl_now/dl_total * 1000.0).trunc()/10.0 == (dl_now/dl_total * 100.0).trunc()  {
+        (curler.callback.unwrap())(dl_total, dl_now);
     }
     0
 }
@@ -100,7 +99,7 @@ unsafe extern "C" fn callback_internal(callback: extern fn(f64, f64) -> (), dl_t
 macro_rules! curle {
     ($e:expr) => {{
         let result = $e;
-        if result as u32 != curl_consts::HandleCode::CURLE_OK as u32 {
+        if result != curl_consts::HandleCode::CURLE_OK as u32 {
             Err(result)
         } else {
             Ok(())
@@ -109,17 +108,21 @@ macro_rules! curle {
 }
 
 
+pub struct Curler<'c> {
+    pub callback: Option<&'c dyn Fn(f64, f64) -> ()>,
+    pub curl: u64,
+}
 
-impl HttpCurl for Curler {
+impl<'a, 'c> Curler<'c> {
     /// creates a new curler
-    extern "Rust" fn new() -> Self { 
+    pub extern "Rust" fn new() -> Self { 
         install_curl();
         let curl_handle = unsafe { easy_init() };
         return Curler{callback: None, curl: curl_handle as u64};
     }
 
     /// download a file from the given url to the given location
-    extern "Rust" fn download(&mut self, url: String, location: String) -> Result<(), u32>{
+    pub extern "Rust" fn download(&mut self, url: String, location: String) -> Result<(), u32>{
         // change thread to high priority
         //unsafe {
         //    skyline::nn::os::ChangeThreadPriority(skyline::nn::os::GetCurrentThread(), 2);
@@ -154,7 +157,7 @@ impl HttpCurl for Curler {
             match self.callback {
                 Some(function) => {
                     curle!(easy_setopt(curl, curl_consts::CURLOPT_NOPROGRESS, 0u64))?;
-                    curle!(easy_setopt(curl, curl_consts::CURLOPT_PROGRESSDATA, function as *const ()))?;
+                    curle!(easy_setopt(curl, curl_consts::CURLOPT_PROGRESSDATA, self as *const Curler))?;
                     curle!(easy_setopt(curl, curl_consts::CURLOPT_PROGRESSFUNCTION, callback_internal as *const ()))?;
                 },
                 None => curle!(easy_setopt(curl, curl_consts::CURLOPT_NOPROGRESS, 1u64))?,
@@ -163,9 +166,23 @@ impl HttpCurl for Curler {
             curle!(easy_setopt(curl, curl_consts::CURLOPT_SSL_CTX_FUNCTION, curl_ssl_ctx_callback as *const ()))?;
             curle!(easy_setopt(curl, curl_consts::CURLOPT_USERAGENT, "smashnet\0".as_ptr()))?;
             // println!("beginning download.");
-            match curle!(easy_perform(curl)){
-                Ok(()) => (), //println!("curl success?"),
-                Err(e) => println!("Error during curl: {}", e) 
+            let result = curle!(easy_perform(curl));
+            match result {
+                Ok(()) => println!("curl success?"),
+                Err(e) => {
+                    println!("Error during curl: {}", e);
+                    println!("flushing writer");
+                    writer.flush();
+                    println!("dropping writer");
+                    std::mem::drop(writer);
+                    match fs::metadata(&temp_file.as_str()) {
+                        Ok(data) => {
+                            std::fs::remove_file(&temp_file);
+                        }
+                        Err(e) => println!("Error while checking for temp file, after failed download: {:?}", e)
+                    }
+                    return Err(e);
+                }
             };
         }
 
@@ -173,13 +190,6 @@ impl HttpCurl for Curler {
         writer.flush();
         // println!("dropping writer");
         std::mem::drop(writer);
-
-        if std::fs::metadata(&temp_file.as_str()).unwrap().len() < 8 {
-            // empty files should be considered an error.
-            // println!("File was empty, assuming failure.");
-            std::fs::remove_file(&temp_file);
-            return Err(0);
-        }
 
         // replace/rename the temp file to the expected location
         if Path::new(location.as_str()).exists() {
@@ -197,7 +207,7 @@ impl HttpCurl for Curler {
     }
 
     /// GET text from the given url
-    extern "Rust" fn get(&mut self, url: String) -> Result<String, String>{
+    pub extern "Rust" fn get(&mut self, url: String) -> Result<String, String>{
         let tick = unsafe {skyline::nn::os::GetSystemTick() as usize};
         fs::create_dir_all("sd:/downloads");
         let location = format!("sd:/downloads/{}.txt", tick);
@@ -219,7 +229,7 @@ impl HttpCurl for Curler {
         return Ok(str);
     }
 
-    extern "Rust" fn get_bytes(&mut self, url: String, out_buf: &mut Vec<u8>) -> Result<(), u32> {
+    pub extern "Rust" fn get_bytes(&mut self, url: String, out_buf: &mut Vec<u8>) -> Result<(), u32> {
         let mut writer = BufWriter::with_capacity(0x40_000,  out_buf);
         unsafe {
             let cstr = [url.as_str(), "\0"].concat();
@@ -235,9 +245,9 @@ impl HttpCurl for Curler {
             curle!(easy_setopt(curl, curl_consts::CURLOPT_FAILONERROR, 1u64))?;
        
             match self.callback {
-                Some(function) => {
+                Some(ref function) => {
                     curle!(easy_setopt(curl, curl_consts::CURLOPT_NOPROGRESS, 0u64))?;
-                    curle!(easy_setopt(curl, curl_consts::CURLOPT_PROGRESSDATA, function as *const ()))?;
+                    curle!(easy_setopt(curl, curl_consts::CURLOPT_PROGRESSDATA, self as *const Curler))?;
                     curle!(easy_setopt(curl, curl_consts::CURLOPT_PROGRESSFUNCTION, callback_internal as *const ()))?;
                 },
                 None => curle!(easy_setopt(curl, curl_consts::CURLOPT_NOPROGRESS, 1u64))?,
@@ -261,13 +271,13 @@ impl HttpCurl for Curler {
 
     }
 
-    extern "Rust" fn progress_callback(&mut self, function: fn(f64, f64) -> ()) -> &mut Self {
+    pub extern "Rust" fn progress_callback(&mut self, function: &'a (impl Fn(f64, f64) -> () + 'a)) -> &mut Self where 'a: 'c {
         self.callback = Some(function);
         self
     }
 }
 
-impl Drop for Curler {
+impl <'c>Drop for Curler<'c> {
     extern "Rust" fn drop(&mut self) {
         let curl = self.curl as *mut CurlHandle;
         if !curl.is_null() {
