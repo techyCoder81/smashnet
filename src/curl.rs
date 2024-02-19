@@ -56,19 +56,19 @@ pub unsafe extern "C" fn easy_perform(curl: *mut CurlHandle) -> u32;
 #[skyline::from_offset(0xC70)]
 pub unsafe extern "C" fn easy_cleanup(curl: *mut CurlHandle) -> u32;
 
-#[skyline::from_offset(0x36f6d40)]
+#[skyline::from_offset(0x36f79c0)]
 pub unsafe extern "C" fn curl_global_malloc(size: usize) -> *mut u8;
 
-#[skyline::from_offset(0x36f6dc0)]
+#[skyline::from_offset(0x36f7a40)]
 pub unsafe extern "C" fn curl_global_free(ptr: *mut u8);
 
-#[skyline::from_offset(0x36f6e40)]
+#[skyline::from_offset(0x36f7ac0)]
 pub unsafe extern "C" fn curl_global_realloc(ptr: *mut u8, size: usize) -> *mut u8;
 
-#[skyline::from_offset(0x36f6ec0)]
+#[skyline::from_offset(0x36f7b40)]
 pub unsafe extern "C" fn curl_global_strdup(ptr: *const u8) -> *mut u8;
 
-#[skyline::from_offset(0x36f6fa0)]
+#[skyline::from_offset(0x36f7c20)]
 pub unsafe extern "C" fn curl_global_calloc(nmemb: usize, size: usize) -> *mut u8;
 
 #[skyline::from_offset(0x21fd50)]
