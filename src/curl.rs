@@ -22,12 +22,12 @@ pub struct curl_slist {
 
 #[skyline::hook(offset = 0x27ac0, inline)]
 pub unsafe fn libcurl_resolver_thread_stack_size_set(ctx: &mut skyline::hooks::InlineCtx) {
-    *ctx.registers[1].x.as_mut() = 0x10_000;
+    ctx.registers[1].set_x(0x10_000);
 }
 
 #[skyline::hook(offset = 0x27af4, inline)]
 pub unsafe fn libcurl_resolver_thread_stack_size_set2(ctx: &mut skyline::hooks::InlineCtx) {
-    *ctx.registers[4].x.as_mut() = 0x10_000;
+    ctx.registers[4].set_x(0x10_000);
 }
 
 
