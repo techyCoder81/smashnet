@@ -56,19 +56,19 @@ pub unsafe extern "C" fn easy_perform(curl: *mut CurlHandle) -> u32;
 #[skyline::from_offset(0xC70)]
 pub unsafe extern "C" fn easy_cleanup(curl: *mut CurlHandle) -> u32;
 
-#[skyline::from_offset(0x36f7dc0)]
+#[skyline::from_offset(0x36f7dc0 + 0x5b0)]
 pub unsafe extern "C" fn curl_global_malloc(size: usize) -> *mut u8;
 
-#[skyline::from_offset(0x36f7e40)]
+#[skyline::from_offset(0x36f7e40 + 0x5b0)]
 pub unsafe extern "C" fn curl_global_free(ptr: *mut u8);
 
-#[skyline::from_offset(0x36f7ec0)]
+#[skyline::from_offset(0x36f7ec0 + 0x5b0)]
 pub unsafe extern "C" fn curl_global_realloc(ptr: *mut u8, size: usize) -> *mut u8;
 
-#[skyline::from_offset(0x36f7f40)]
+#[skyline::from_offset(0x36f7f40 + 0x5b0)]
 pub unsafe extern "C" fn curl_global_strdup(ptr: *const u8) -> *mut u8;
 
-#[skyline::from_offset(0x36f8020)]
+#[skyline::from_offset(0x36f8020 + 0x5b0)]
 pub unsafe extern "C" fn curl_global_calloc(nmemb: usize, size: usize) -> *mut u8;
 
 #[skyline::from_offset(0x21fd50)]
@@ -115,7 +115,7 @@ pub struct Curler<'c> {
 
 impl<'a, 'c> Curler<'c> {
     /// creates a new curler
-    pub extern "Rust" fn new() -> Self { 
+    pub extern "Rust" fn new() -> Self {
         install_curl();
         let curl_handle = unsafe { easy_init() };
         return Curler{callback: None, curl: curl_handle as u64};
@@ -153,7 +153,7 @@ impl<'a, 'c> Curler<'c> {
             curle!(easy_setopt(curl, curl_consts::CURLOPT_WRITEDATA, &mut writer))?;
             curle!(easy_setopt(curl, curl_consts::CURLOPT_WRITEFUNCTION, write_fn as *const ()))?;
             curle!(easy_setopt(curl, curl_consts::CURLOPT_FAILONERROR, 1u64))?;
-       
+
             match self.callback {
                 Some(function) => {
                     curle!(easy_setopt(curl, curl_consts::CURLOPT_NOPROGRESS, 0u64))?;
@@ -243,7 +243,7 @@ impl<'a, 'c> Curler<'c> {
             curle!(easy_setopt(curl, curl_consts::CURLOPT_WRITEDATA, &mut writer))?;
             curle!(easy_setopt(curl, curl_consts::CURLOPT_WRITEFUNCTION, write_fn_data as *const ()))?;
             curle!(easy_setopt(curl, curl_consts::CURLOPT_FAILONERROR, 1u64))?;
-       
+
             match self.callback {
                 Some(ref function) => {
                     curle!(easy_setopt(curl, curl_consts::CURLOPT_NOPROGRESS, 0u64))?;
@@ -261,7 +261,7 @@ impl<'a, 'c> Curler<'c> {
                 Err(e) => {
                     println!("Error during curl: {}", e);
                     return Err(e);
-                } 
+                }
             };
         }
 
@@ -282,11 +282,11 @@ impl <'c>Drop for Curler<'c> {
         let curl = self.curl as *mut CurlHandle;
         if !curl.is_null() {
             // println!("cleaning up curl handle from curler.");
-            unsafe { 
+            unsafe {
                 match curle!(easy_cleanup(curl)) {
                     Ok(_) => (), //println!("cleaned up curl successfully."),
                     Err(e) => println!("cleaning up curl failed with error code: {}", e),
-                }; 
+                };
             }
         }
     }
